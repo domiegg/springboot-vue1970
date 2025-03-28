@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.YonghuDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.qiye_id as qiyeId
+        ,a.username as username
+        ,a.password as password
+        ,a.yonghu_uuid_number as yonghuUuidNumber
+        ,a.yonghu_name as yonghuName
+        ,a.yonghu_phone as yonghuPhone
+        ,a.yonghu_id_number as yonghuIdNumber
+        ,a.yonghu_photo as yonghuPhoto
+        ,a.sex_types as sexTypes
+        ,a.yonghu_email as yonghuEmail
+        ,a.jinyong_types as jinyongTypes
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.YonghuView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,qiye.qiye_name as qiyeName
+        ,qiye.qiye_fuzeren as qiyeFuzeren
+        ,qiye.qiye_phone as qiyePhone
+        ,qiye.qiye_email as qiyeEmail
+        ,qiye.qiye_logo_photo as qiyeLogoPhoto
+        ,qiye.qiye_photo as qiyePhoto
+        ,qiye.qiye_content as qiyeContent
+        ,qiye.jinyong_types as jinyongTypes
+
+        FROM yonghu  a
+        left JOIN qiye qiye ON a.qiye_id = qiye.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.qiyeId != null and params.qiyeId != ''">
+                and (
+                    a.qiye_id = #{params.qiyeId}
+                )
+            </if>
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and a.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and a.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test=" params.yonghuUuidNumber != '' and params.yonghuUuidNumber != null and params.yonghuUuidNumber != 'null' ">
+                and a.yonghu_uuid_number like CONCAT('%',#{params.yonghuUuidNumber},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and a.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and a.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and a.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test="params.sexTypes != null and params.sexTypes != ''">
+                and a.sex_types = #{params.sexTypes}
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and a.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.jinyongTypes != null and params.jinyongTypes != ''">
+                and a.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+                <!-- 判断企业的id不为空 -->
+            <if test=" params.qiyeIdNotNull != '' and params.qiyeIdNotNull != null and params.qiyeIdNotNull != 'null' ">
+                and a.qiye_id IS NOT NULL
+            </if>
+            <if test=" params.qiyeName != '' and params.qiyeName != null and params.qiyeName != 'null' ">
+                and qiye.qiye_name like CONCAT('%',#{params.qiyeName},'%')
+            </if>
+            <if test=" params.qiyeFuzeren != '' and params.qiyeFuzeren != null and params.qiyeFuzeren != 'null' ">
+                and qiye.qiye_fuzeren like CONCAT('%',#{params.qiyeFuzeren},'%')
+            </if>
+            <if test=" params.qiyePhone != '' and params.qiyePhone != null and params.qiyePhone != 'null' ">
+                and qiye.qiye_phone like CONCAT('%',#{params.qiyePhone},'%')
+            </if>
+            <if test=" params.qiyeEmail != '' and params.qiyeEmail != null and params.qiyeEmail != 'null' ">
+                and qiye.qiye_email like CONCAT('%',#{params.qiyeEmail},'%')
+            </if>
+            <if test=" params.qiyeContent != '' and params.qiyeContent != null and params.qiyeContent != 'null' ">
+                and qiye.qiye_content like CONCAT('%',#{params.qiyeContent},'%')
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and qiye.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

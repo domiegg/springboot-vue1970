@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZhaobiaoToubiaoDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.zhaobiao_id as zhaobiaoId
+        ,a.yonghu_id as yonghuId
+        ,a.zhaobiao_toubiao_uuid_number as zhaobiaoToubiaoUuidNumber
+        ,a.zhaobiao_toubiao_file as zhaobiaoToubiaoFile
+        ,a.zhaobiao_toubiao_time as zhaobiaoToubiaoTime
+        ,a.zhaobiao_toubiao_content as zhaobiaoToubiaoContent
+        ,a.insert_time as insertTime
+        ,a.zhaobiao_toubiao_yesno_types as zhaobiaoToubiaoYesnoTypes
+        ,a.zhaobiao_toubiao_pingfen as zhaobiaoToubiaoPingfen
+        ,a.zhaobiao_toubiao_yesno_text as zhaobiaoToubiaoYesnoText
+        ,a.zhaobiao_toubiao_shenhe_time as zhaobiaoToubiaoShenheTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZhaobiaoToubiaoView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,yonghu.qiye_id as yonghuQiyeId
+        ,yonghu.yonghu_uuid_number as yonghuUuidNumber
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.jinyong_types as jinyongTypes
+        ,zhaobiao.qiye_id as zhaobiaoQiyeId
+        ,zhaobiao.zhaobiao_uuid_number as zhaobiaoUuidNumber
+        ,zhaobiao.zhaobiao_name as zhaobiaoName
+        ,zhaobiao.zhaobiao_address as zhaobiaoAddress
+        ,zhaobiao.zhaobiao_time as zhaobiaoTime
+        ,zhaobiao.zhaobiao_types as zhaobiaoTypes
+        ,zhaobiao.zhaobiao_file as zhaobiaoFile
+        ,zhaobiao.zhaobiao_content as zhaobiaoContent
+
+        FROM zhaobiao_toubiao  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+        left JOIN zhaobiao zhaobiao ON a.zhaobiao_id = zhaobiao.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.zhaobiaoId != null and params.zhaobiaoId != ''">
+                and (
+                    a.zhaobiao_id = #{params.zhaobiaoId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.zhaobiaoToubiaoUuidNumber != '' and params.zhaobiaoToubiaoUuidNumber != null and params.zhaobiaoToubiaoUuidNumber != 'null' ">
+                and a.zhaobiao_toubiao_uuid_number like CONCAT('%',#{params.zhaobiaoToubiaoUuidNumber},'%')
+            </if>
+            <if test=" params.zhaobiaoToubiaoTimeStart != '' and params.zhaobiaoToubiaoTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zhaobiao_toubiao_time) >= UNIX_TIMESTAMP(#{params.zhaobiaoToubiaoTimeStart}) ]]>
+            </if>
+            <if test=" params.zhaobiaoToubiaoTimeEnd != '' and params.zhaobiaoToubiaoTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zhaobiao_toubiao_time) <= UNIX_TIMESTAMP(#{params.zhaobiaoToubiaoTimeEnd}) ]]>
+            </if>
+            <if test="params.zhaobiaoToubiaoTime != null and params.zhaobiaoToubiaoTime != ''">
+                and a.zhaobiao_toubiao_time = #{params.zhaobiaoToubiaoTime}
+            </if>
+            <if test=" params.zhaobiaoToubiaoContent != '' and params.zhaobiaoToubiaoContent != null and params.zhaobiaoToubiaoContent != 'null' ">
+                and a.zhaobiao_toubiao_content like CONCAT('%',#{params.zhaobiaoToubiaoContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+            <if test="params.zhaobiaoToubiaoYesnoTypes != null and params.zhaobiaoToubiaoYesnoTypes != ''">
+                and a.zhaobiao_toubiao_yesno_types = #{params.zhaobiaoToubiaoYesnoTypes}
+            </if>
+            <if test="params.zhaobiaoToubiaoPingfenStart != null ">
+                <![CDATA[  and a.zhaobiao_toubiao_pingfen >= #{params.zhaobiaoToubiaoPingfenStart}   ]]>
+            </if>
+            <if test="params.zhaobiaoToubiaoPingfenEnd != null ">
+                <![CDATA[  and a.zhaobiao_toubiao_pingfen <= #{params.zhaobiaoToubiaoPingfenEnd}   ]]>
+            </if>
+            <if test="params.zhaobiaoToubiaoPingfen != null and params.zhaobiaoToubiaoPingfen != ''">
+                and a.zhaobiao_toubiao_pingfen = #{params.zhaobiaoToubiaoPingfen}
+            </if>
+            <if test=" params.zhaobiaoToubiaoYesnoText != '' and params.zhaobiaoToubiaoYesnoText != null and params.zhaobiaoToubiaoYesnoText != 'null' ">
+                and a.zhaobiao_toubiao_yesno_text like CONCAT('%',#{params.zhaobiaoToubiaoYesnoText},'%')
+            </if>
+            <if test=" params.zhaobiaoToubiaoShenheTimeStart != '' and params.zhaobiaoToubiaoShenheTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zhaobiao_toubiao_shenhe_time) >= UNIX_TIMESTAMP(#{params.zhaobiaoToubiaoShenheTimeStart}) ]]>
+            </if>
+            <if test=" params.zhaobiaoToubiaoShenheTimeEnd != '' and params.zhaobiaoToubiaoShenheTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zhaobiao_toubiao_shenhe_time) <= UNIX_TIMESTAMP(#{params.zhaobiaoToubiaoShenheTimeEnd}) ]]>
+            </if>
+            <if test="params.zhaobiaoToubiaoShenheTime != null and params.zhaobiaoToubiaoShenheTime != ''">
+                and a.zhaobiao_toubiao_shenhe_time = #{params.zhaobiaoToubiaoShenheTime}
+            </if>
+
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test="params.qiyeId != null  and params.qiyeId != ''">
+                and yonghu.qiye_id = #{params.qiyeId}
+            </if>
+            <if test=" params.yonghuUuidNumber != '' and params.yonghuUuidNumber != null and params.yonghuUuidNumber != 'null' ">
+                and yonghu.yonghu_uuid_number like CONCAT('%',#{params.yonghuUuidNumber},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and yonghu.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+                <!-- 判断招标的id不为空 -->
+            <if test=" params.zhaobiaoIdNotNull != '' and params.zhaobiaoIdNotNull != null and params.zhaobiaoIdNotNull != 'null' ">
+                and a.zhaobiao_id IS NOT NULL
+            </if>
+            <if test="params.qiyeId != null  and params.qiyeId != ''">
+                and zhaobiao.qiye_id = #{params.qiyeId}
+            </if>
+            <if test=" params.zhaobiaoUuidNumber != '' and params.zhaobiaoUuidNumber != null and params.zhaobiaoUuidNumber != 'null' ">
+                and zhaobiao.zhaobiao_uuid_number like CONCAT('%',#{params.zhaobiaoUuidNumber},'%')
+            </if>
+            <if test=" params.zhaobiaoName != '' and params.zhaobiaoName != null and params.zhaobiaoName != 'null' ">
+                and zhaobiao.zhaobiao_name like CONCAT('%',#{params.zhaobiaoName},'%')
+            </if>
+            <if test=" params.zhaobiaoAddress != '' and params.zhaobiaoAddress != null and params.zhaobiaoAddress != 'null' ">
+                and zhaobiao.zhaobiao_address like CONCAT('%',#{params.zhaobiaoAddress},'%')
+            </if>
+            <if test=" params.zhaobiaoTimeStart != '' and params.zhaobiaoTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(zhaobiao.zhaobiao_time) >= UNIX_TIMESTAMP(#{params.zhaobiaoTimeStart}) ]]>
+            </if>
+            <if test=" params.zhaobiaoTimeEnd != '' and params.zhaobiaoTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(zhaobiao.zhaobiao_time) <= UNIX_TIMESTAMP(#{params.zhaobiaoTimeEnd}) ]]>
+            </if>
+            <if test="params.zhaobiaoTime != null and params.zhaobiaoTime != ''">
+                and a.zhaobiao_time = #{params.zhaobiaoTime}
+            </if>
+            <if test="params.zhaobiaoTypes != null  and params.zhaobiaoTypes != ''">
+                and zhaobiao.zhaobiao_types = #{params.zhaobiaoTypes}
+            </if>
+
+            <if test=" params.zhaobiaoContent != '' and params.zhaobiaoContent != null and params.zhaobiaoContent != 'null' ">
+                and zhaobiao.zhaobiao_content like CONCAT('%',#{params.zhaobiaoContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(zhaobiao.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(zhaobiao.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.LixiangPingshenDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yonghu_id as yonghuId
+        ,a.lixiang_id as lixiangId
+        ,a.lixiang_pingshen_uuid_number as lixiangPingshenUuidNumber
+        ,a.lixiang_pingshen_name as lixiangPingshenName
+        ,a.lixiang_pingshen_types as lixiangPingshenTypes
+        ,a.lixiang_pingshen_file as lixiangPingshenFile
+        ,a.lixiang_pingshen_content as lixiangPingshenContent
+        ,a.insert_time as insertTime
+        ,a.lixiang_pingshen_yesno_types as lixiangPingshenYesnoTypes
+        ,a.lixiang_pingshen_yesno_text as lixiangPingshenYesnoText
+        ,a.lixiang_pingshen_shenhe_time as lixiangPingshenShenheTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.LixiangPingshenView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,lixiang.yonghu_id as lixiangYonghuId
+        ,lixiang.lixiang_uuid_number as lixiangUuidNumber
+        ,lixiang.lixiang_name as lixiangName
+        ,lixiang.lixiang_types as lixiangTypes
+        ,lixiang.lixiang_address as lixiangAddress
+        ,lixiang.lixiang_file as lixiangFile
+        ,lixiang.lixiang_content as lixiangContent
+        ,lixiang.lixiang_yesno_types as lixiangYesnoTypes
+        ,lixiang.lixiang_yesno_text as lixiangYesnoText
+        ,lixiang.lixiang_shenhe_time as lixiangShenheTime
+        ,yonghu.qiye_id as yonghuQiyeId
+        ,yonghu.yonghu_uuid_number as yonghuUuidNumber
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.jinyong_types as jinyongTypes
+
+        FROM lixiang_pingshen  a
+        left JOIN lixiang lixiang ON a.lixiang_id = lixiang.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                    or lixiang.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.lixiangId != null and params.lixiangId != ''">
+                and (
+                    a.lixiang_id = #{params.lixiangId}
+                )
+            </if>
+            <if test=" params.lixiangPingshenUuidNumber != '' and params.lixiangPingshenUuidNumber != null and params.lixiangPingshenUuidNumber != 'null' ">
+                and a.lixiang_pingshen_uuid_number like CONCAT('%',#{params.lixiangPingshenUuidNumber},'%')
+            </if>
+            <if test=" params.lixiangPingshenName != '' and params.lixiangPingshenName != null and params.lixiangPingshenName != 'null' ">
+                and a.lixiang_pingshen_name like CONCAT('%',#{params.lixiangPingshenName},'%')
+            </if>
+            <if test="params.lixiangPingshenTypes != null and params.lixiangPingshenTypes != ''">
+                and a.lixiang_pingshen_types = #{params.lixiangPingshenTypes}
+            </if>
+            <if test=" params.lixiangPingshenContent != '' and params.lixiangPingshenContent != null and params.lixiangPingshenContent != 'null' ">
+                and a.lixiang_pingshen_content like CONCAT('%',#{params.lixiangPingshenContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+            <if test="params.lixiangPingshenYesnoTypes != null and params.lixiangPingshenYesnoTypes != ''">
+                and a.lixiang_pingshen_yesno_types = #{params.lixiangPingshenYesnoTypes}
+            </if>
+            <if test=" params.lixiangPingshenYesnoText != '' and params.lixiangPingshenYesnoText != null and params.lixiangPingshenYesnoText != 'null' ">
+                and a.lixiang_pingshen_yesno_text like CONCAT('%',#{params.lixiangPingshenYesnoText},'%')
+            </if>
+            <if test=" params.lixiangPingshenShenheTimeStart != '' and params.lixiangPingshenShenheTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.lixiang_pingshen_shenhe_time) >= UNIX_TIMESTAMP(#{params.lixiangPingshenShenheTimeStart}) ]]>
+            </if>
+            <if test=" params.lixiangPingshenShenheTimeEnd != '' and params.lixiangPingshenShenheTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.lixiang_pingshen_shenhe_time) <= UNIX_TIMESTAMP(#{params.lixiangPingshenShenheTimeEnd}) ]]>
+            </if>
+            <if test="params.lixiangPingshenShenheTime != null and params.lixiangPingshenShenheTime != ''">
+                and a.lixiang_pingshen_shenhe_time = #{params.lixiangPingshenShenheTime}
+            </if>
+
+                <!-- 判断项目立项的id不为空 -->
+            <if test=" params.lixiangIdNotNull != '' and params.lixiangIdNotNull != null and params.lixiangIdNotNull != 'null' ">
+                and a.lixiang_id IS NOT NULL
+            </if>
+            <if test=" params.lixiangUuidNumber != '' and params.lixiangUuidNumber != null and params.lixiangUuidNumber != 'null' ">
+                and lixiang.lixiang_uuid_number like CONCAT('%',#{params.lixiangUuidNumber},'%')
+            </if>
+            <if test=" params.lixiangName != '' and params.lixiangName != null and params.lixiangName != 'null' ">
+                and lixiang.lixiang_name like CONCAT('%',#{params.lixiangName},'%')
+            </if>
+            <if test="params.lixiangTypes != null  and params.lixiangTypes != ''">
+                and lixiang.lixiang_types = #{params.lixiangTypes}
+            </if>
+
+            <if test=" params.lixiangAddress != '' and params.lixiangAddress != null and params.lixiangAddress != 'null' ">
+                and lixiang.lixiang_address like CONCAT('%',#{params.lixiangAddress},'%')
+            </if>
+            <if test=" params.lixiangContent != '' and params.lixiangContent != null and params.lixiangContent != 'null' ">
+                and lixiang.lixiang_content like CONCAT('%',#{params.lixiangContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(lixiang.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(lixiang.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+            <if test="params.lixiangYesnoTypes != null  and params.lixiangYesnoTypes != ''">
+                and lixiang.lixiang_yesno_types = #{params.lixiangYesnoTypes}
+            </if>
+
+            <if test=" params.lixiangYesnoText != '' and params.lixiangYesnoText != null and params.lixiangYesnoText != 'null' ">
+                and lixiang.lixiang_yesno_text like CONCAT('%',#{params.lixiangYesnoText},'%')
+            </if>
+            <if test=" params.lixiangShenheTimeStart != '' and params.lixiangShenheTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(lixiang.lixiang_shenhe_time) >= UNIX_TIMESTAMP(#{params.lixiangShenheTimeStart}) ]]>
+            </if>
+            <if test=" params.lixiangShenheTimeEnd != '' and params.lixiangShenheTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(lixiang.lixiang_shenhe_time) <= UNIX_TIMESTAMP(#{params.lixiangShenheTimeEnd}) ]]>
+            </if>
+            <if test="params.lixiangShenheTime != null and params.lixiangShenheTime != ''">
+                and a.lixiang_shenhe_time = #{params.lixiangShenheTime}
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test="params.qiyeId != null  and params.qiyeId != ''">
+                and yonghu.qiye_id = #{params.qiyeId}
+            </if>
+            <if test=" params.yonghuUuidNumber != '' and params.yonghuUuidNumber != null and params.yonghuUuidNumber != 'null' ">
+                and yonghu.yonghu_uuid_number like CONCAT('%',#{params.yonghuUuidNumber},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and yonghu.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

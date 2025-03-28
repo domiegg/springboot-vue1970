@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ShangjiGenjinDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.shangji_id as shangjiId
+        ,a.yonghu_id as yonghuId
+        ,a.shangji_genjin_uuid_number as shangjiGenjinUuidNumber
+        ,a.shangji_genjin_name as shangjiGenjinName
+        ,a.shangji_genjin_time as shangjiGenjinTime
+        ,a.shangji_genjin_file as shangjiGenjinFile
+        ,a.shangji_genjin_types as shangjiGenjinTypes
+        ,a.shangji_genjin_content as shangjiGenjinContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ShangjiGenjinView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,shangji.yonghu_id as shangjiYonghuId
+        ,shangji.shangji_uuid_number as shangjiUuidNumber
+        ,shangji.shangji_name as shangjiName
+        ,shangji.shangji_address as shangjiAddress
+        ,shangji.shangji_time as shangjiTime
+        ,shangji.shangji_dengji_types as shangjiDengjiTypes
+        ,shangji.shangji_types as shangjiTypes
+        ,shangji.shangji_file as shangjiFile
+        ,shangji.shangji_content as shangjiContent
+        ,yonghu.qiye_id as yonghuQiyeId
+        ,yonghu.yonghu_uuid_number as yonghuUuidNumber
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.jinyong_types as jinyongTypes
+
+        FROM shangji_genjin  a
+        left JOIN shangji shangji ON a.shangji_id = shangji.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.shangjiId != null and params.shangjiId != ''">
+                and (
+                    a.shangji_id = #{params.shangjiId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                    or shangji.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.shangjiGenjinUuidNumber != '' and params.shangjiGenjinUuidNumber != null and params.shangjiGenjinUuidNumber != 'null' ">
+                and a.shangji_genjin_uuid_number like CONCAT('%',#{params.shangjiGenjinUuidNumber},'%')
+            </if>
+            <if test=" params.shangjiGenjinName != '' and params.shangjiGenjinName != null and params.shangjiGenjinName != 'null' ">
+                and a.shangji_genjin_name like CONCAT('%',#{params.shangjiGenjinName},'%')
+            </if>
+            <if test=" params.shangjiGenjinTimeStart != '' and params.shangjiGenjinTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.shangji_genjin_time) >= UNIX_TIMESTAMP(#{params.shangjiGenjinTimeStart}) ]]>
+            </if>
+            <if test=" params.shangjiGenjinTimeEnd != '' and params.shangjiGenjinTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.shangji_genjin_time) <= UNIX_TIMESTAMP(#{params.shangjiGenjinTimeEnd}) ]]>
+            </if>
+            <if test="params.shangjiGenjinTime != null and params.shangjiGenjinTime != ''">
+                and a.shangji_genjin_time = #{params.shangjiGenjinTime}
+            </if>
+            <if test="params.shangjiGenjinTypes != null and params.shangjiGenjinTypes != ''">
+                and a.shangji_genjin_types = #{params.shangjiGenjinTypes}
+            </if>
+            <if test=" params.shangjiGenjinContent != '' and params.shangjiGenjinContent != null and params.shangjiGenjinContent != 'null' ">
+                and a.shangji_genjin_content like CONCAT('%',#{params.shangjiGenjinContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断商机的id不为空 -->
+            <if test=" params.shangjiIdNotNull != '' and params.shangjiIdNotNull != null and params.shangjiIdNotNull != 'null' ">
+                and a.shangji_id IS NOT NULL
+            </if>
+            <if test=" params.shangjiUuidNumber != '' and params.shangjiUuidNumber != null and params.shangjiUuidNumber != 'null' ">
+                and shangji.shangji_uuid_number like CONCAT('%',#{params.shangjiUuidNumber},'%')
+            </if>
+            <if test=" params.shangjiName != '' and params.shangjiName != null and params.shangjiName != 'null' ">
+                and shangji.shangji_name like CONCAT('%',#{params.shangjiName},'%')
+            </if>
+            <if test=" params.shangjiAddress != '' and params.shangjiAddress != null and params.shangjiAddress != 'null' ">
+                and shangji.shangji_address like CONCAT('%',#{params.shangjiAddress},'%')
+            </if>
+            <if test=" params.shangjiTimeStart != '' and params.shangjiTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(shangji.shangji_time) >= UNIX_TIMESTAMP(#{params.shangjiTimeStart}) ]]>
+            </if>
+            <if test=" params.shangjiTimeEnd != '' and params.shangjiTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(shangji.shangji_time) <= UNIX_TIMESTAMP(#{params.shangjiTimeEnd}) ]]>
+            </if>
+            <if test="params.shangjiTime != null and params.shangjiTime != ''">
+                and a.shangji_time = #{params.shangjiTime}
+            </if>
+            <if test="params.shangjiDengjiTypes != null  and params.shangjiDengjiTypes != ''">
+                and shangji.shangji_dengji_types = #{params.shangjiDengjiTypes}
+            </if>
+
+            <if test="params.shangjiTypes != null  and params.shangjiTypes != ''">
+                and shangji.shangji_types = #{params.shangjiTypes}
+            </if>
+
+            <if test=" params.shangjiContent != '' and params.shangjiContent != null and params.shangjiContent != 'null' ">
+                and shangji.shangji_content like CONCAT('%',#{params.shangjiContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(shangji.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(shangji.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test="params.qiyeId != null  and params.qiyeId != ''">
+                and yonghu.qiye_id = #{params.qiyeId}
+            </if>
+            <if test=" params.yonghuUuidNumber != '' and params.yonghuUuidNumber != null and params.yonghuUuidNumber != 'null' ">
+                and yonghu.yonghu_uuid_number like CONCAT('%',#{params.yonghuUuidNumber},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and yonghu.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
